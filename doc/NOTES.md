@@ -5,7 +5,7 @@
 
 ## État au 2026-11-25
 
-- Pas de dépôt git.
+- **Dépôt git** à la racine `kamclick2/`, branche `main`, distant `origin` = https://github.com/colombc/autoclicker.git (premier push le 2026-11-25). `.gitignore` racine : node_modules, dist, dist-electron, release, .angular, kamclick.json, selftest-result.json.
 - **Application V2 en cours dans `app/`** (2026-11-25), phase 1 fonctionnelle. Prototype jetable dans `proto-koffi/`.
 - Seul fichier de départ : `doc/kamclick.au3`, l'ancienne version (KamClick V1.2, AutoIt, 2011, « KamSoft »).
 - **Confirmé** : kamclick2 est une réécriture de cet autoclicker.
@@ -296,3 +296,4 @@ Dossier `proto-koffi/` (jetable, mais `src/platform/` et `src/scheduler.js` sont
 - 2026-11-25 : application phase 1 créée dans `app/` (Electron 45 + Angular 22 + Material). Testée en E2E et en exe portable.
 - 2026-11-25 : logo KamSoft vectorisé (`doc/kamsoft.svg`) et ajouté au pied de page de l'appli. Thème sombre vérifié. Incident : F10 simulé a fermé l'instance de l'utilisateur.
 - 2026-11-25 : icône carrée « <k> » créée et intégrée (exe, fenêtre, favicon).
+- 2026-11-25 : dépôt git initialisé, remote GitHub ajouté, premier commit poussé sur `main`.
