@@ -1,0 +1,40 @@
+{
+  "name": "kamclick-proto-koffi",
+  "version": "1.0.0",
+  "description": "Prototype koffi pour KamClick 2",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "selftest": "electron . --selftest",
+    "dist": "electron-builder --win portable --x64"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "koffi": "3.3.8"
+  },
+  "devDependencies": {
+    "electron": "45.5.0",
+    "electron-builder": "26.18.0"
+  },
+  "private": true,
+  "build": {
+    "appId": "fr.kamsoft.kamclick.proto",
+    "productName": "KamClickProto",
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "src/**/*"
+    ],
+    "asarUnpack": [
+      "node_modules/koffi/**",
+      "node_modules/@koromix/**"
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "directories": {
+      "output": "dist"
+    }
+  }
+}

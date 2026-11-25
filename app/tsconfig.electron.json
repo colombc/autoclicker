@@ -1,0 +1,20 @@
+/* Compilation du process main et du preload Electron (CommonJS, Node 24). */
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "commonjs",
+    "moduleResolution": "node10",
+    "esModuleInterop": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "rootDir": ".",
+    "outDir": "dist-electron",
+    "ignoreDeprecations": "6.0"
+  },
+  "include": ["electron/**/*.ts", "shared/**/*.ts"]
+}

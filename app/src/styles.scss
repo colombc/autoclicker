@@ -1,0 +1,48 @@
+// Thème Material 3, clair ou sombre selon le thème de Windows.
+// Polices et icônes embarquées via angular.json > styles (pas de Google Fonts :
+// l'appli doit marcher hors ligne).
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  color-scheme: light dark;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$orange-palette,
+      ),
+      typography: Roboto,
+      density: -2,
+    )
+  );
+
+  // Couleurs d'état (vert = en cours, rouge = à l'arrêt), comme la V1.2.
+  --kc-running: light-dark(#1e8e3e, #4caf50);
+  --kc-stopped: light-dark(#c62828, #e05252);
+}
+
+body {
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+  // Fenêtre de taille fixe : défilement seulement si un bandeau d'avertissement s'ajoute.
+  overflow-y: auto;
+  user-select: none;
+}
+
+input {
+  user-select: text;
+}
+
+// Pas de flèches dans les champs numériques.
+input[type='number'] {
+  appearance: textfield;
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+}

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'">
+  <title>Prototype koffi</title>
+  <style>
+    body { font: 13px system-ui, sans-serif; margin: 12px; background: #f6f6f6; color: #222; }
+    @media (prefers-color-scheme: dark) { body { background: #1e1e1e; color: #ddd; } fieldset { border-color: #555; } }
+    fieldset { margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; }
+    legend { font-weight: 600; }
+    input[type=number] { width: 70px; }
+    button { margin: 2px 4px 2px 0; }
+    pre { white-space: pre-wrap; font-size: 11px; margin: 4px 0; max-height: 160px; overflow: auto; }
+    .running { color: #2bb627; font-weight: 600; }
+    .stopped { color: #c81418; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <fieldset>
+    <legend>Infos</legend>
+    <pre id="info">…</pre>
+  </fieldset>
+
+  <fieldset>
+    <legend>Position du curseur (rafraîchie en continu)</legend>
+    <pre id="pos">…</pre>
+  </fieldset>
+
+  <fieldset>
+    <legend>Clic unique (dans 3 s, le temps de placer la souris)</legend>
+    <button data-click="left">Gauche ici</button>
+    <button data-click="right">Droit ici</button>
+    <button data-click="left" data-fixed>Gauche en X/Y</button>
+    <button data-click="right" data-fixed>Droit en X/Y</button>
+    <pre id="click"></pre>
+  </fieldset>
+
+  <fieldset>
+    <legend>Autoclic</legend>
+    <div>X <input id="x" type="number" value="0"> Y <input id="y" type="number" value="0"> (F3 = capturer, pixels physiques)
+      <label><input id="fixed" type="checkbox"> position fixe</label></div>
+    <div>Intervalle <input id="interval" type="number" value="100" min="10"> ms
+      · Bouton <select id="button"><option value="left">gauche</option><option value="right">droit</option></select>
+      · Max <input id="max" type="number" value="0" min="0"> (0 = illimité)</div>
+    <div><button id="start">Démarrer (F1)</button><button id="stop">Arrêter (F2)</button>
+      <span id="state" class="stopped">à l'arrêt</span> · F10 = quitter</div>
+    <pre id="stats"></pre>
+  </fieldset>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const fmt = (o) => JSON.stringify(o, null, 1);
+
+    proto.info().then((i) => { $('info').textContent = fmt(i); });
+    proto.on('shortcuts', (s) => { $('info').textContent += '\nraccourcis : ' + fmt(s); });
+
+    setInterval(async () => {
+      try { $('pos').textContent = fmt(await proto.positions()); } catch (e) { $('pos').textContent = String(e); }
+    }, 200);
+
+    document.querySelectorAll('[data-click]').forEach((b) => b.addEventListener('click', async () => {
+      const point = b.hasAttribute('data-fixed') ? { x: +$('x').value, y: +$('y').value } : null;
+      $('click').textContent = 'clic dans 3 s…';
+      $('click').textContent = fmt(await proto.clickIn({ button: b.dataset.click, point, delayMs: 3000 }));
+    }));
+
+    function start() {
+      proto.start({
+        interval: Math.max(10, +$('interval').value),
+        button: $('button').value,
+        fixed: $('fixed').checked,
+        x: +$('x').value,
+        y: +$('y').value,
+        maxClicks: +$('max').value,
+      });
+    }
+    $('start').onclick = start;
+    $('stop').onclick = () => proto.stop();
+    proto.on('shortcut', (s) => { if (s === 'start') start(); });
+    proto.on('capture', (p) => { $('x').value = p.x; $('y').value = p.y; });
+    proto.on('state', (s) => {
+      $('state').textContent = s.running ? 'en cours' : "à l'arrêt";
+      $('state').className = s.running ? 'running' : 'stopped';
+      if (s.stats) $('stats').textContent = fmt(s.stats);
+    });
+    setInterval(async () => { const s = await proto.stats(); if (s && $('state').className === 'running') $('stats').textContent = fmt(s); }, 500);
+  </script>
+</body>
+</html>

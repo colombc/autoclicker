@@ -1,0 +1,217 @@
+:host {
+  display: block;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px 10px;
+}
+
+kbd {
+  font: 600 11px/1 var(--mat-sys-body-medium-font);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-bottom-width: 2px;
+  background: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-on-surface);
+}
+
+// En-tête
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.brand-icon {
+  color: var(--mat-sys-primary);
+}
+.brand-name {
+  font: var(--mat-sys-title-large);
+  font-weight: 500;
+}
+.brand-version,
+.quit-hint {
+  font: var(--mat-sys-label-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Bandeaux d'avertissement
+.banner {
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font: var(--mat-sys-body-small);
+  p {
+    margin: 0;
+  }
+  p + p {
+    margin-top: 4px;
+  }
+}
+.banner--warn {
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+}
+.banner--error {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+// Bloc d'état : compteur + démarrer/arrêter
+.hero {
+  --state: var(--kc-stopped);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'state state'
+    'count actions'
+    'error error';
+  align-items: center;
+  gap: 6px 12px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: var(--mat-sys-surface-container);
+  border: 1px solid color-mix(in srgb, var(--state) 35%, transparent);
+  transition: border-color 0.2s;
+}
+.hero--running {
+  --state: var(--kc-running);
+}
+.hero-state {
+  grid-area: state;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--mat-sys-label-large);
+  color: var(--mat-sys-on-surface-variant);
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--state);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--state) 20%, transparent);
+}
+.hero--running .dot {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@keyframes pulse {
+  50% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--state) 0%, transparent);
+  }
+}
+.hero-count {
+  grid-area: count;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.count {
+  font: var(--mat-sys-display-medium);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.count-label {
+  font: var(--mat-sys-title-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+.hero-actions {
+  grid-area: actions;
+  button {
+    height: 44px;
+    padding: 0 20px;
+  }
+}
+.btn-start {
+  --mat-button-filled-container-color: var(--kc-running);
+  --mat-button-filled-label-text-color: #fff;
+}
+.btn-stop {
+  --mat-button-filled-container-color: var(--kc-stopped);
+  --mat-button-filled-label-text-color: #fff;
+}
+.hero-error {
+  grid-area: error;
+  margin: 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-error);
+}
+
+// Cartes de réglages
+.card {
+  padding: 10px 14px 12px;
+  border-radius: 16px;
+  background: var(--mat-sys-surface-container-low);
+  transition: opacity 0.2s;
+}
+.card--muted {
+  opacity: 0.6;
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  mat-icon {
+    color: var(--mat-sys-primary);
+  }
+  h2 {
+    margin: 0;
+    font: var(--mat-sys-title-small);
+  }
+}
+.push {
+  margin-left: auto;
+}
+.row {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  transition: opacity 0.2s;
+}
+.row--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.row--3 {
+  grid-template-columns: 1fr 1fr 1.6fr;
+}
+.row--2 {
+  grid-template-columns: 1fr 1fr;
+}
+.row.disabled {
+  opacity: 0.5;
+}
+.hint {
+  margin: 8px 2px 0;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: var(--mat-sys-label-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+.foot-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.foot-logo {
+  width: 84px;
+  height: 42px;
+}
+.foot-path {
+  cursor: help;
+}

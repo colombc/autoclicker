@@ -1,0 +1,181 @@
+<main class="shell">
+  <header class="top">
+    <div class="brand">
+      <mat-icon class="brand-icon">ads_click</mat-icon>
+      <span class="brand-name">KamClick</span>
+      <span class="brand-version">{{ kc.version() ? 'v' + kc.version() : '' }}</span>
+    </div>
+    <span class="quit-hint"><kbd>{{ keys().quit }}</kbd> pour quitter</span>
+  </header>
+
+  @if (!kc.available) {
+    <div class="banner banner--error">
+      <mat-icon>error</mat-icon>
+      <span>Interface ouverte hors d'Electron : les clics ne sont pas disponibles.</span>
+    </div>
+  }
+
+  @if (hasWarnings()) {
+    <div class="banner banner--warn">
+      <mat-icon>warning</mat-icon>
+      <div>
+        @if (kc.warnings().settingsFile; as message) {
+          <p>{{ message }}</p>
+        }
+        @for (message of kc.warnings().shortcuts; track message) {
+          <p>{{ message }}</p>
+        }
+      </div>
+    </div>
+  }
+
+  <section class="hero" [class.hero--running]="status().running">
+    <div class="hero-state">
+      <span class="dot"></span>
+      @if (status().running) {
+        <span>En cours · <kbd>{{ keys().stop }}</kbd> pour arrêter</span>
+      } @else {
+        <span>À l'arrêt · <kbd>{{ keys().start }}</kbd> pour démarrer</span>
+      }
+    </div>
+    <div class="hero-count">
+      <span class="count">{{ status().count.toLocaleString('fr-FR') }}</span>
+      <span class="count-label">{{ status().count > 1 ? 'clics' : 'clic' }}</span>
+    </div>
+    <div class="hero-actions">
+      @if (status().running) {
+        <button mat-flat-button class="btn-stop" (click)="kc.stop()">
+          <mat-icon>stop</mat-icon> Arrêter
+        </button>
+      } @else {
+        <button mat-flat-button class="btn-start" (click)="kc.start()" [disabled]="!kc.ready()">
+          <mat-icon>play_arrow</mat-icon> Démarrer
+        </button>
+      }
+    </div>
+    @if (status().clickError; as error) {
+      <p class="hero-error"><mat-icon inline>block</mat-icon> {{ error }}</p>
+    }
+  </section>
+
+  <section class="card" [class.card--muted]="s().random.enabled">
+    <div class="card-head">
+      <mat-icon>timer</mat-icon>
+      <h2>Intervalle entre les clics</h2>
+    </div>
+    <div class="row row--4">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Heures</mat-label>
+        <input matInput type="number" min="0" step="1" [value]="s().interval.hours"
+          (input)="setNumber($event, n => ({ interval: { hours: n } }))"
+          (blur)="resetField($event, s().interval.hours)">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Min</mat-label>
+        <input matInput type="number" min="0" step="1" [value]="s().interval.minutes"
+          (input)="setNumber($event, n => ({ interval: { minutes: n } }))"
+          (blur)="resetField($event, s().interval.minutes)">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Sec</mat-label>
+        <input matInput type="number" min="0" step="1" [value]="s().interval.seconds"
+          (input)="setNumber($event, n => ({ interval: { seconds: n } }))"
+          (blur)="resetField($event, s().interval.seconds)">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>1/100 s</mat-label>
+        <input matInput type="number" min="0" step="1" [value]="s().interval.hundredths"
+          (input)="setNumber($event, n => ({ interval: { hundredths: n } }))"
+          (blur)="resetField($event, s().interval.hundredths)">
+      </mat-form-field>
+    </div>
+    <p class="hint">
+      @if (s().random.enabled) {
+        Remplacé par l'intervalle aléatoire.
+      } @else {
+        Un clic toutes les {{ fixedIntervalLabel() }}.
+      }
+    </p>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <mat-icon>shuffle</mat-icon>
+      <h2>Intervalle aléatoire</h2>
+      <mat-slide-toggle class="push" [checked]="s().random.enabled"
+        (change)="kc.update({ random: { enabled: $event.checked } })" aria-label="Intervalle aléatoire" />
+    </div>
+    <div class="row row--3" [class.disabled]="!s().random.enabled">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>De</mat-label>
+        <input matInput type="number" min="0" step="1" [value]="s().random.from"
+          (input)="setNumber($event, n => ({ random: { from: n } }))"
+          (blur)="resetField($event, s().random.from)">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>À</mat-label>
+        <input matInput type="number" min="0" step="1" [value]="s().random.to"
+          (input)="setNumber($event, n => ({ random: { to: n } }))"
+          (blur)="resetField($event, s().random.to)">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Unité</mat-label>
+        <mat-select [value]="s().random.unit" (selectionChange)="setRandomUnit($event.value)">
+          @for (unit of randomUnits; track unit.value) {
+            <mat-option [value]="unit.value">{{ unit.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <mat-icon>mouse</mat-icon>
+      <h2>Bouton de la souris</h2>
+      <mat-button-toggle-group class="push" hideSingleSelectionIndicator [value]="s().button"
+        (change)="setButton($event.value)" aria-label="Bouton de la souris">
+        <mat-button-toggle value="left">Gauche</mat-button-toggle>
+        <mat-button-toggle value="right">Droit</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <mat-icon>my_location</mat-icon>
+      <h2>Position fixe</h2>
+      <mat-slide-toggle class="push" [checked]="s().position.enabled"
+        (change)="kc.update({ position: { enabled: $event.checked } })" aria-label="Position fixe" />
+    </div>
+    <div class="row row--2" [class.disabled]="!s().position.enabled">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>X</mat-label>
+        <input matInput type="number" step="1" [value]="s().position.x"
+          (input)="setNumber($event, n => ({ position: { x: n } }))"
+          (blur)="resetField($event, s().position.x)">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Y</mat-label>
+        <input matInput type="number" step="1" [value]="s().position.y"
+          (input)="setNumber($event, n => ({ position: { y: n } }))"
+          (blur)="resetField($event, s().position.y)">
+      </mat-form-field>
+    </div>
+    <p class="hint">
+      @if (s().position.enabled) {
+        Clic en X/Y. <kbd>{{ keys().capturePosition }}</kbd> pour capturer la position de la souris.
+      } @else {
+        Clic là où se trouve la souris. <kbd>{{ keys().capturePosition }}</kbd> pour capturer une position.
+      }
+    </p>
+  </section>
+
+  <footer class="foot">
+    <span class="foot-brand">
+      <app-kamsoft-logo class="foot-logo" />
+      <span>© 2011–2026 · Coded by Kam</span>
+    </span>
+    <span class="foot-path" [title]="kc.settingsPath()">kamclick.json</span>
+  </footer>
+</main>
